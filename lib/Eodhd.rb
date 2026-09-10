@@ -9,6 +9,7 @@ require_relative './Eodhd/ExchangeSymbol'
 require_relative './Eodhd/Intraday'
 require_relative './Eodhd/Fundamentals'
 require_relative './Eodhd/WebSocketClient'
+require_relative './Eodhd/VERSION'
 
 class Eodhd
   def exchanges

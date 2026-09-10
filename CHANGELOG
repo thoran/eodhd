@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 20260910
+
+0.19.4: ~ lib/Eodhd.rb: + require_relative './Eodhd/VERSION'; + test/Eodhd/VERSION_test.rb
+
+1. ~ lib/Eodhd.rb: + `require_relative './Eodhd/VERSION'`, last among the requires. The file has been present and unreached, so `require 'eodhd'` left Eodhd::VERSION undefined and the gemspec was the only thing loading it.
+2. + test/Eodhd/VERSION_test.rb: that Eodhd::VERSION is a string, that it is three numbers separated by dots, and that it matches the newest entry in the changelog. Modelled on moby's, which is where the convention comes from.
+3. The test loads the library rather than VERSION.rb, which is the whole of its value: run against v0.19.3 it fails with "uninitialized constant Eodhd::VERSION". Nine libraries were in that state and not one of them carried this test, which is how it went unseen.
+4. ~ Eodhd::VERSION: /0.19.3/0.19.4/
+
+
 ## 20260821
 
 0.19.3: Rewrite the CHANGELOG in the form changelogger writes.
