@@ -1,6 +1,12 @@
-# CHANGELOG
+# eodhd/CHANGELOG
 
 ## 20260915
+
+0.19.6: + test/gemspec_test.rb, covering both gemspecs and that they agree.
+
+1. + test/gemspec_test.rb: for each gemspec, that it validates, that it is named what it should be, that it pins no date, that its version is Eodhd::VERSION, its runtime and development dependencies, and that it ships the gemspec naming it. Modelled on moby's, which is where the convention comes from, and upon bitget.rb 0.6.9 for the second gemspec.
+2. + test/gemspec_test.rb: three examples that the two agree — the same files but for the one naming each, the same declared fields, the same dependencies. 0.19.5's second gemspec is worth nothing if the two drift, and nothing read them together.
+3. ~ Eodhd::VERSION: /0.19.5/0.19.6/
 
 0.19.5: + eodhd.gemspec, so that the gem resolves under both names.
 
