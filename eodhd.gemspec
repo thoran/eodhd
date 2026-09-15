@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
 
   spec.author = 'thoran'
   spec.email = 'code@thoran.com'
-  spec.homepage = 'http://github.com/thoran/eodhd.rb'
+  spec.homepage = 'http://github.com/thoran/eodhd'
   spec.license = 'MIT'
 
   spec.require_paths = ['lib']
