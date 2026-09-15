@@ -2,6 +2,13 @@
 
 ## 20260915
 
+0.19.7: /thoran\/eodhd.rb/thoran\/eodhd/, the repository renamed.
+
+1. ~ eodhd.rb.gemspec and eodhd.gemspec: spec.homepage.
+2. ~ README.md: the fork URL.
+3. The gem keeps both its names, eodhd.rb and eodhd, the repository's name being no part of them.
+4. ~ Eodhd::VERSION: /0.19.6/0.19.7/
+
 0.19.6: + test/gemspec_test.rb, covering both gemspecs and that they agree.
 
 1. + test/gemspec_test.rb: for each gemspec, that it validates, that it is named what it should be, that it pins no date, that its version is Eodhd::VERSION, its runtime and development dependencies, and that it ships the gemspec naming it. Modelled on moby's, which is where the convention comes from, and upon bitget.rb 0.6.9 for the second gemspec.
