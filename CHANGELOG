@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 20260915
+
+0.19.5: + eodhd.gemspec, so that the gem resolves under both names.
+
+1. + eodhd.gemspec: eodhd.rb.gemspec with /eodhd.rb/eodhd/ in spec.name and in spec.files, upon measurand 0.1.4's pattern.
+2. ~ Gemfile: /gemspec/gemspec name: 'eodhd.rb'/, bundler refusing to parse a Gemfile whose bare gemspec directive finds more than one gemspec to choose from.
+3. ~ Eodhd::VERSION: /0.19.4/0.19.5/
+
+
 ## 20260910
 
 0.19.4: ~ lib/Eodhd.rb: + require_relative './Eodhd/VERSION'; + test/Eodhd/VERSION_test.rb
