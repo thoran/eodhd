@@ -23,7 +23,7 @@ require_relative './helper'
     end
 
     it "declares its runtime dependencies" do
-      _(spec.runtime_dependencies.collect(&:name).sort).must_equal(%w{http.rb iodine})
+      _(spec.runtime_dependencies.collect(&:name).sort).must_equal(%w{http.rb iodine logger})
     end
 
     it "declares its development dependencies" do

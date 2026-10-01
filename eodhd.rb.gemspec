@@ -26,18 +26,20 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.7'
 
   spec.files = [
-    'CHANGELOG',
     'eodhd.rb.gemspec',
-    'Gemfile',
     Dir['lib/**/*.rb'],
+    Dir['test/**/*'],
+    'CHANGELOG',
+    'Gemfile',
+    'LICENSE',
     'Rakefile',
     'README.md',
-    Dir['test/**/*.rb']
   ].flatten
 
   spec.dependencies = %w{
     http.rb
     iodine
+    logger
   }
 
   spec.development_dependencies = %w{

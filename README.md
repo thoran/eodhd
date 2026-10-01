@@ -9,7 +9,7 @@ Access the eodhd.com API with Ruby.
 Add this line to your application's Gemfile:
 
 ```ruby
-  gem 'eodhd.rb'
+  gem 'eodhd'
 ```
 
 And then execute:
@@ -21,7 +21,7 @@ And then execute:
 Or install it yourself as:
 
 ```bash
-  $ gem install eodhd.rb
+  $ gem install eodhd
 ```
 
 ## Usage
@@ -29,6 +29,8 @@ Or install it yourself as:
 ### Setup
 
 ```ruby
+require 'eodhd'
+
 api_token = 'api_token'
 eodhd = Eodhd.new(api_token: api_token)
 ```
@@ -139,12 +141,6 @@ eodhd.us_trade_stream('AAPL,MSFT')
 eodhd.us_quote_stream('AAPL,MSFT')
 eodhd.forex_stream('EURUSD')
 eodhd.crypto_stream('BTC-USD')
-```
-
-#### Or use the general interface
-
-```ruby
-eodhd.stream(asset_class: 'us', symbols: 'AAPL,MSFT')
 ```
 
 ## License

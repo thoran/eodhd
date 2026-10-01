@@ -1,4 +1,4 @@
-# Eodhd.rb
+# eodhd.rb
 # Eodhd
 
 require_relative './Eodhd/Client'

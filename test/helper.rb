@@ -8,7 +8,7 @@ require 'vcr'
 require 'webmock/minitest'
 
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
-require 'Eodhd'
+require 'eodhd'
 
 VCR.configure do |config|
   config.cassette_library_dir = File.expand_path('./fixtures/vcr_cassettes', __dir__)

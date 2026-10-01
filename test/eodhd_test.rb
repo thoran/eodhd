@@ -1,6 +1,6 @@
-# Eodhd_test.rb
+# eodhd_test.rb
 
-require_relative "helper"
+require_relative './helper'
 
 describe Eodhd do
   let(:api_token){ENV.fetch('EODHD_API_TOKEN', '<API_TOKEN>')}

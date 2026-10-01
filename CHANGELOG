@@ -1,5 +1,23 @@
 # eodhd/CHANGELOG
 
+## 20261001
+
+0.19.8: /Eodhd.rb/eodhd.rb/; + logger gem; ~ gemspec: + test/fixtures; + LICENSE
+
+1. ~ Gemfile: /gemspec name: 'eodhd.rb'/gemspec name: 'eodhd'/
+2. ~ lib/Eodhd.rb --> lib/eodhd.rb, in the index.
+3. ~ test/eodhd_test.rb: /Eodhd_test.rb/eodhd_test.rb/
+4. ~ test/helper.rb: /require 'Eodhd'/require 'eodhd'/
+5. ~ eodhd.gemspec: spec.files: /Dir['test/**/*.rb']/Dir['test/**/*']/
+6. ~ eodhd.rb.gemspec: spec.files: /Dir['test/**/*.rb']/Dir['test/**/*']/
+7. ~ README.md: /gem 'eodhd.rb'/gem 'eodhd'/
+8. ~ README.md: /gem install eodhd.rb/gem install eodhd/
+9. ~ README.md: - Eodhd#stream example, which has been private since 0.18.0.
+10. ~ eodhd.gemspec and eodhd.rb.gemspec: spec.dependencies: + logger gem (Ruby 4 has it as a gem now.)
+11. ~ test/gemspec_test.rb: + logger
+12. ~ Eodhd::VERSION: /0.19.7/0.19.8/
+
+
 ## 20260915
 
 0.19.7: Rename the repo: /eodhd.rb/eodhd/.
