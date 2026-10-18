@@ -1,5 +1,13 @@
 # eodhd/CHANGELOG
 
+## 20261018
+
+0.19.9: The tests load WebMock again.
+
+1. ~ test/helper.rb: + webmock's http_rb adapter marked as loaded before requiring webmock/minitest. It takes http.rb's HTTP::VERSION for the http gem's and raises NameError patching an HTTP::Client which isn't there.
+2. ~ Eodhd::VERSION: /0.19.8/0.19.9/
+
+
 ## 20261001
 
 0.19.8: /Eodhd.rb/eodhd.rb/; + logger gem; ~ gemspec: + test/fixtures; + LICENSE

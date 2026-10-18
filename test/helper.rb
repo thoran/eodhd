@@ -1,5 +1,16 @@
 # helper.rb
 
+# Skip webmock's http_rb adapter: it takes any HTTP::VERSION for the http gem's,
+# and http.rb defines one, so it crashes trying to patch an HTTP::Client which
+# isn't there. On case-insensitive filesystems its require 'http' loads http.rb.
+
+gem 'webmock'
+
+$LOADED_FEATURES << File.join(
+  Gem.loaded_specs['webmock'].full_gem_path,
+  'lib/webmock/http_lib_adapters/http_rb_adapter.rb'
+)
+
 require 'minitest/autorun'
 require 'minitest/mock'
 require 'minitest/spec'
