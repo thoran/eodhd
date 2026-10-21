@@ -36,11 +36,11 @@ Gem::Specification.new do |spec|
     'README.md',
   ].flatten
 
-  spec.dependencies = %w{
-    http.rb
-    iodine
-    logger
-  }
+  spec.dependencies = [
+    ['http.rb', '>= 1.7.0'],
+    'iodine',
+    'logger',
+  ]
 
   spec.development_dependencies = %w{
     rake

@@ -26,6 +26,10 @@ require_relative './helper'
       _(spec.runtime_dependencies.collect(&:name).sort).must_equal(%w{http.rb iodine logger})
     end
 
+    it "requires http.rb 1.7.0 or later, whose load file is lib/http.rb" do
+      _(spec.runtime_dependencies.find{|dependency| dependency.name == 'http.rb'}.requirement.to_s).must_equal('>= 1.7.0')
+    end
+
     it "declares its development dependencies" do
       _(spec.development_dependencies.collect(&:name).sort).must_equal(%w{minitest minitest-mock minitest-spec-context rake simplecov vcr webmock})
     end
