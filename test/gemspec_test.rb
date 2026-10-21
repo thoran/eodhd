@@ -43,7 +43,10 @@ describe 'the two gemspecs' do
   let(:bare){Gem::Specification.load(File.expand_path('../eodhd.gemspec', __dir__))}
   let(:dotted){Gem::Specification.load(File.expand_path('../eodhd.rb.gemspec', __dir__))}
 
+  # Gem::Specification.load caches each spec, and validate removes directories
+  # from its files in place, so each is validated here whichever ran first.
   it "ship the same files but for the one naming each" do
+    [bare, dotted].each(&:validate)
     _(bare.files - ['eodhd.gemspec']).must_equal(dotted.files - ['eodhd.rb.gemspec'])
   end
 

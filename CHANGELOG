@@ -1,5 +1,13 @@
 # eodhd/CHANGELOG
 
+## 20261021
+
+0.19.10: ~ test/gemspec_test.rb: Validate both gemspecs before comparing their files.
+
+1. ~ test/gemspec_test.rb: "ship the same files but for the one naming each": + [bare, dotted].each(&:validate). Gem::Specification.load caches each spec and validate removes directories from its files in place, so the comparison failed whenever one gemspec had been validated and the other not.
+2. ~ Eodhd::VERSION: /0.19.9/0.19.10/
+
+
 ## 20261018
 
 0.19.9: The tests load WebMock again.
