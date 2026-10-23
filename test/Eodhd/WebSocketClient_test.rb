@@ -93,26 +93,119 @@ describe Eodhd::WebSocketClient do
   end
 
   describe "#run" do
-    it "configures Iodine and starts connection" do
-      client = Eodhd::WebSocketClient.new(api_token: api_token, asset_class: 'us', symbols: 'AAPL', consumer: consumer)
+    # The server's half of the opening handshake (RFC 6455, 4.2.2), answering with the request line.
+    def accept_handshake(socket)
+      request = []
+      request << socket.gets.chomp until request.last == ''
+      key = request.grep(/\ASec-WebSocket-Key:/i).first.split(':', 2).last.strip
+      accept = [OpenSSL::Digest.digest('SHA1', key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')].pack('m0')
+      socket.write("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: #{accept}\r\n\r\n")
+      request.first
+    end
 
-      iodine_connect_called = false
-      iodine_start_called = false
+    # A masked client frame of under 126 bytes.
+    def read_client_frame(socket)
+      length = socket.read(2).bytes.last & 0x7f
+      mask = socket.read(4).bytes
+      socket.read(length).bytes.each_with_index.map{|byte, i| byte ^ mask[i % 4]}.pack('C*')
+    end
 
-      Iodine.stub(:threads=, nil) do
-        Iodine.stub(:connect, ->(opts){iodine_connect_called = true}) do
-          Iodine.stub(:start, ->{iodine_start_called = true}) do
-            client.run
-          end
-        end
+    def text_frame(text)
+      [0x81, text.bytesize].pack('CC') + text
+    end
+
+    def close_frame
+      [0x88, 2, 1000].pack('CCn')
+    end
+
+    it "subscribes, hands each message to the consumer, and returns once the server closes" do
+      received = []
+      client = Eodhd::WebSocketClient.new(api_token: 'api_token', asset_class: 'crypto', symbols: 'BTC-USD', consumer: ->(data){received << data})
+      client_socket, server_socket = UNIXSocket.pair
+      server = Thread.new do
+        request_line = accept_handshake(server_socket)
+        subscription = read_client_frame(server_socket)
+        server_socket.write(text_frame('{"s":"BTC-USD","p":"81430.24"}'))
+        server_socket.write(close_frame)
+        [request_line, subscription]
       end
+      client.stub(:tls_socket, client_socket){client.run}
+      request_line, subscription = server.value
+      _(request_line).must_equal('GET /ws/crypto?api_token=api_token HTTP/1.1')
+      _(JSON.parse(subscription)).must_equal({'action' => 'subscribe', 'symbols' => 'BTC-USD'})
+      _(received).must_equal([{'s' => 'BTC-USD', 'p' => '81430.24'}])
+    end
 
-      _(iodine_connect_called).must_equal(true)
-      _(iodine_start_called).must_equal(true)
+    it "returns when the server drops the connection" do
+      received = []
+      client = Eodhd::WebSocketClient.new(api_token: 'api_token', asset_class: 'crypto', symbols: 'BTC-USD', consumer: ->(data){received << data})
+      client_socket, server_socket = UNIXSocket.pair
+      server = Thread.new do
+        accept_handshake(server_socket)
+        server_socket.close
+      end
+      client.stub(:tls_socket, client_socket){client.run}
+      server.join
+      _(received).must_equal([])
+    end
+  end
+
+  describe "#tls_socket" do
+    def self_signed_certificate(key)
+      certificate = OpenSSL::X509::Certificate.new
+      certificate.version = 2
+      certificate.serial = 1
+      certificate.subject = certificate.issuer = OpenSSL::X509::Name.parse('/CN=localhost')
+      certificate.public_key = key.public_key
+      certificate.not_before = Time.now - 60
+      certificate.not_after = Time.now + 3600
+      certificate.sign(key, OpenSSL::Digest.new('SHA256'))
+    end
+
+    # Yields the port of a local TLS server with a self-signed certificate, and the host names its clients sent.
+    def with_tls_server
+      key = OpenSSL::PKey::RSA.new(2048)
+      context = OpenSSL::SSL::SSLContext.new
+      context.cert, context.key = self_signed_certificate(key), key
+      server_names = []
+      context.servername_cb = ->((socket, name)){server_names << name; nil}
+      tcp_server = TCPServer.new('localhost', 0)
+      ssl_server = OpenSSL::SSL::SSLServer.new(tcp_server, context)
+      server = Thread.new{ssl_server.accept rescue nil}
+      yield tcp_server.addr[1], server_names
+    ensure
+      server&.join(5)
+      ssl_server&.close
+    end
+
+    it "names the host in the TLS handshake (SNI)" do
+      client = Eodhd::WebSocketClient.new(api_token: api_token, asset_class: 'crypto', symbols: 'BTC-USD', consumer: consumer)
+      with_tls_server do |port, server_names|
+        _{client.send(:tls_socket, host: 'localhost', port: port)}.must_raise(OpenSSL::SSL::SSLError)
+        _(server_names).must_equal(['localhost'])
+      end
+    end
+
+    it "refuses a certificate it can't verify" do
+      client = Eodhd::WebSocketClient.new(api_token: api_token, asset_class: 'crypto', symbols: 'BTC-USD', consumer: consumer)
+      with_tls_server do |port, server_names|
+        error = _{client.send(:tls_socket, host: 'localhost', port: port)}.must_raise(OpenSSL::SSL::SSLError)
+        _(error.message).must_match(/certificate verify failed/)
+      end
     end
   end
 
   describe "Handler" do
+    describe "#on_open" do
+      it "subscribes to its symbols" do
+        sent = []
+        driver = Struct.new(:sent){def text(message) = sent << message}.new(sent)
+        handler = Eodhd::WebSocketClient::Handler.new(symbols: 'AAPL,MSFT', consumer: consumer, logger: nil)
+        handler.on_open(driver)
+        _(sent.collect{|message| JSON.parse(message)}).must_equal([{'action' => 'subscribe', 'symbols' => 'AAPL,MSFT'}])
+      end
+    end
+
     describe "#on_message" do
       it "parses JSON and calls consumer" do
         received_data = nil

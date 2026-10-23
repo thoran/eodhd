@@ -2,6 +2,19 @@
 
 ## 20261024
 
+0.20.0: Replace iodine with websocket-driver, so as WebSocketClient sends SNI.
+
+1. ~ eodhd.gemspec and eodhd.rb.gemspec: spec.dependencies: - iodine, + websocket-driver. EODHD's WebSocket endpoints refuse a TLS handshake without SNI, which neither iodine 0.7.60 nor 0.8.2 sends, and 0.8.2 also leaves the API token's query string off the request.
+2. + Eodhd::WebSocketClient::Connection, the URL and socket for WebSocket::Driver.
+3. + Eodhd::WebSocketClient#tls_socket, #tls_context: naming the host (SNI) and verifying its certificate.
+4. + Eodhd::WebSocketClient#websocket_driver
+5. ~ Eodhd::WebSocketClient#run: reads into a WebSocket::Driver until it closes, or until EOFError, Errno::EPIPE or Errno::ECONNRESET. An exception from the consumer, or an Eodhd::Error for a frame which isn't JSON, now ends run, where iodine printed it and carried on.
+6. ~ Eodhd::WebSocketClient::Handler#on_open: subscribes with WebSocket::Driver#text.
+7. - Eodhd::WebSocketClient::Handler#on_close
+8. ~ test/Eodhd/WebSocketClient_test.rb: #run against a server on a socket pair, rather than with Iodine stubbed; + #tls_socket against a local TLS server; + Handler#on_open.
+9. ~ test/gemspec_test.rb: "declares its runtime dependencies": - iodine, + websocket-driver.
+10. ~ Eodhd::VERSION: /0.19.13/0.20.0/
+
 0.19.13: Fix WebSocketClient.us_trade, .us_quote, .forex and .crypto.
 
 1. ~ Eodhd::WebSocketClient.us_trade, .us_quote, .forex and .crypto: /self.class.new/new/. Within class << self, self.class is Class, so each raised TypeError.

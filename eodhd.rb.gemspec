@@ -38,8 +38,8 @@ Gem::Specification.new do |spec|
 
   spec.dependencies = [
     ['http.rb', '>= 1.7.0'],
-    'iodine',
     'logger',
+    'websocket-driver',
   ]
 
   spec.development_dependencies = %w{

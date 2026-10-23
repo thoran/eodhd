@@ -7,9 +7,12 @@
 #   ii.  US market quote data: wss://ws.eodhistoricaldata.com/ws/us-quote?api_token=XXX
 #   iii. Forex: wss://ws.eodhistoricaldata.com/ws/forex?api_token=XXX
 #   iv.  Crypto: wss://ws.eodhistoricaldata.com/ws/crypto?api_token=XXX
+# 2. The endpoints refuse a TLS handshake which doesn't name the host (SNI).
 
-require 'iodine'
 require 'json'
+require 'openssl'
+require 'socket'
+require 'websocket/driver'
 
 require_relative './DefaultLogger'
 require_relative './Error'
@@ -17,19 +20,33 @@ require_relative './Error'
 class Eodhd
   class WebSocketClient
     API_HOST = 'ws.eodhistoricaldata.com'
+    API_PORT = 443
+    READ_SIZE = 16384
+
+    # What WebSocket::Driver writes to: the URL it asks for and the socket to write to.
+    class Connection
+      attr_reader :url
+
+      def write(data)
+        @socket.write(data)
+      end
+
+      private
+
+      def initialize(url:, socket:)
+        @url = url
+        @socket = socket
+      end
+    end
 
     class Handler
-      def on_open(connection)
-        connection.write({action: 'subscribe', symbols: @symbols}.to_json)
+      def on_open(driver)
+        driver.text({action: 'subscribe', symbols: @symbols}.to_json)
       end
 
-      def on_message(connection, message)
+      def on_message(driver, message)
         dataframe = handle_response(message)
         @consumer.call(dataframe) if @consumer
-      end
-
-      def on_close(connection)
-        Iodine.stop
       end
 
       private
@@ -94,11 +111,14 @@ class Eodhd
     end
 
     def run
-      Iodine.threads = 1
-      Iodine.connect(url: url, handler: Handler.new(symbols: @symbols, consumer: @consumer, logger: @logger))
-      Iodine.start
-    rescue SystemExit, Interrupt
+      socket = tls_socket
+      driver = websocket_driver(socket)
+      driver.start
+      driver.parse(socket.readpartial(READ_SIZE)) until driver.state == :closed
+    rescue EOFError, Errno::EPIPE, Errno::ECONNRESET, SystemExit, Interrupt
       return
+    ensure
+      socket&.close
     end
 
     private
@@ -125,6 +145,31 @@ class Eodhd
 
     def url
       "wss://#{API_HOST}#{self.class.path_prefix}/#{@asset_class}?api_token=#{@api_token}"
+    end
+
+    def tls_context
+      context = OpenSSL::SSL::SSLContext.new
+      context.set_params(verify_mode: OpenSSL::SSL::VERIFY_PEER)
+      context
+    end
+
+    def tls_socket(host: API_HOST, port: API_PORT)
+      socket = OpenSSL::SSL::SSLSocket.new(TCPSocket.new(host, port), tls_context)
+      socket.hostname = host
+      socket.sync_close = true
+      socket.connect
+      socket
+    rescue OpenSSL::SSL::SSLError
+      socket.close
+      raise
+    end
+
+    def websocket_driver(socket)
+      driver = WebSocket::Driver.client(Connection.new(url: url, socket: socket))
+      handler = Handler.new(symbols: @symbols, consumer: @consumer, logger: @logger)
+      driver.on(:open){handler.on_open(driver)}
+      driver.on(:message){|event| handler.on_message(driver, event.data)}
+      driver
     end
   end
 end

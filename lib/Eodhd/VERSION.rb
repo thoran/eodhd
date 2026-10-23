@@ -1,3 +1,3 @@
 class Eodhd
-  VERSION = '0.19.13'
+  VERSION = '0.20.0'
 end

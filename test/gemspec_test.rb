@@ -23,7 +23,7 @@ require_relative './helper'
     end
 
     it "declares its runtime dependencies" do
-      _(spec.runtime_dependencies.collect(&:name).sort).must_equal(%w{http.rb iodine logger})
+      _(spec.runtime_dependencies.collect(&:name).sort).must_equal(%w{http.rb logger websocket-driver})
     end
 
     it "requires http.rb 1.7.0 or later, whose load file is lib/http.rb" do
