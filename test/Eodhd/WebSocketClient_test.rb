@@ -6,6 +6,46 @@ describe Eodhd::WebSocketClient do
   let(:api_token){ENV.fetch('EODHD_API_TOKEN', '<API_TOKEN>')}
   let(:consumer){->(data){}}
 
+  describe ".us_trade" do
+    it "makes a client for the US trade stream" do
+      client = Eodhd::WebSocketClient.us_trade(api_token: api_token, symbols: 'AAPL', consumer: consumer)
+      _(client).must_be_instance_of(Eodhd::WebSocketClient)
+      _(client.asset_class).must_equal('us')
+    end
+  end
+
+  describe ".us" do
+    it "makes a client for the US trade stream" do
+      client = Eodhd::WebSocketClient.us(api_token: api_token, symbols: 'AAPL', consumer: consumer)
+      _(client).must_be_instance_of(Eodhd::WebSocketClient)
+      _(client.asset_class).must_equal('us')
+    end
+  end
+
+  describe ".us_quote" do
+    it "makes a client for the US quote stream" do
+      client = Eodhd::WebSocketClient.us_quote(api_token: api_token, symbols: 'AAPL', consumer: consumer)
+      _(client).must_be_instance_of(Eodhd::WebSocketClient)
+      _(client.asset_class).must_equal('us-quote')
+    end
+  end
+
+  describe ".forex" do
+    it "makes a client for the forex stream" do
+      client = Eodhd::WebSocketClient.forex(api_token: api_token, symbols: 'EURUSD', consumer: consumer)
+      _(client).must_be_instance_of(Eodhd::WebSocketClient)
+      _(client.asset_class).must_equal('forex')
+    end
+  end
+
+  describe ".crypto" do
+    it "makes a client for the crypto stream" do
+      client = Eodhd::WebSocketClient.crypto(api_token: api_token, symbols: 'BTC-USD', consumer: consumer)
+      _(client).must_be_instance_of(Eodhd::WebSocketClient)
+      _(client.asset_class).must_equal('crypto')
+    end
+  end
+
   describe "#initialize" do
     it "accepts array of symbols and formats to comma-separated string" do
       client = Eodhd::WebSocketClient.new(api_token: api_token, asset_class: 'us', symbols: ['AAPL', 'MSFT'], consumer: consumer)

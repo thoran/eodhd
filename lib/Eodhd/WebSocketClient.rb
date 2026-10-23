@@ -63,20 +63,20 @@ class Eodhd
       end
 
       def us_trade(api_token:, symbols:, consumer:)
-        self.class.new(api_token: api_token, asset_class: 'us', symbols: symbols, consumer: consumer)
+        new(api_token: api_token, asset_class: 'us', symbols: symbols, consumer: consumer)
       end
       alias_method :us, :us_trade
 
       def us_quote(api_token:, symbols:, consumer:)
-        self.class.new(api_token: api_token, asset_class: 'us-quote', symbols: symbols, consumer: consumer)
+        new(api_token: api_token, asset_class: 'us-quote', symbols: symbols, consumer: consumer)
       end
 
       def forex(api_token:, symbols:, consumer:)
-        self.class.new(api_token: api_token, asset_class: 'forex', symbols: symbols, consumer: consumer)
+        new(api_token: api_token, asset_class: 'forex', symbols: symbols, consumer: consumer)
       end
 
       def crypto(api_token:, symbols:, consumer:)
-        self.class.new(api_token: api_token, asset_class: 'crypto', symbols: symbols, consumer: consumer)
+        new(api_token: api_token, asset_class: 'crypto', symbols: symbols, consumer: consumer)
       end
     end # class << self
 

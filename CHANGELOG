@@ -1,5 +1,14 @@
 # eodhd/CHANGELOG
 
+## 20261024
+
+0.19.13: Fix WebSocketClient.us_trade, .us_quote, .forex and .crypto.
+
+1. ~ Eodhd::WebSocketClient.us_trade, .us_quote, .forex and .crypto: /self.class.new/new/. Within class << self, self.class is Class, so each raised TypeError.
+2. + test/Eodhd/WebSocketClient_test.rb: that .us_trade, .us, .us_quote, .forex and .crypto each make a client for their stream.
+3. ~ Eodhd::VERSION: /0.19.12/0.19.13/
+
+
 ## 20261021
 
 0.19.12: Require http.rb >= 1.7.0, for case-sensitive filesystems.
