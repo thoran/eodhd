@@ -14,6 +14,10 @@ require_relative './helper'
       _(spec.name).must_equal(name)
     end
 
+    it "has a description which says more than its summary" do
+      _(spec.description).wont_equal(spec.summary)
+    end
+
     it "does not pin a date" do
       _(spec.date).must_equal(Gem::Specification.new.date)
     end

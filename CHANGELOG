@@ -1,6 +1,12 @@
 # eodhd/CHANGELOG
 
-## 20261024
+## 20261025
+
+0.20.1: ~ eodhd.gemspec, eodhd.rb.gemspec: Write a custom spec.description, rather than repeating spec.summary.
+
+1. ~ eodhd.gemspec, eodhd.rb.gemspec: ~ spec.description: It matched spec.summary, so gem build warned "description and summary are identical".
+2. + test/gemspec_test.rb: Ensure that each gemspec's description differs from its summary.
+3. ~ Eodhd::VERSION: /0.20.0/0.20.1/
 
 0.20.0: Replace iodine with websocket-driver, so as WebSocketClient sends SNI.
 

@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.version = Eodhd::VERSION
 
   spec.summary = "Access the eodhd.com API with Ruby."
-  spec.description = "Access the eodhd.com API with Ruby."
+  spec.description = "A Ruby client for the eodhd.com financial data API: exchanges, symbols, end-of-day and intraday prices, and fundamentals over HTTP, and real-time US stock trades and quotes, forex, and crypto over WebSockets."
 
   spec.author = 'thoran'
   spec.email = 'code@thoran.com'
